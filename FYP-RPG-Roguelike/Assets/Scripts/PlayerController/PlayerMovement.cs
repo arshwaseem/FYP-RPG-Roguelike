@@ -2,17 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace PlayerControl
-{
+
     public class PlayerMovement : MonoBehaviour
     {
         Vector3 movement;
-        [SerializeField] Rigidbody _rb;
+        Rigidbody _rb;
         [SerializeField] float speed = 5f;
         [SerializeField] float turnRate = 360;
 
-        // Update is called once per frame
-        void Update()
+    private void Awake()
+    {
+        _rb = this.GetComponent<Rigidbody>();
+    }
+
+    // Update is called once per frame
+    void Update()
         {
             TakeInput();
             Look();
@@ -43,4 +47,3 @@ namespace PlayerControl
             }
         }
     }
-}

@@ -1,37 +1,25 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName ="Equpiment", menuName ="Items/Equipment")]
-[Serializable]
-public class Equipment : ConsumableItem
+
+[CreateAssetMenu(fileName ="Equipment",menuName ="Items/Equipment")]
+public class Equipment : Item
 {
-
-    public EquipSlot slot;
-    public float ad;
-    public float armor;
-
-    public void Awake()
+    EquipSlot slot;
+    public override void onItemUse()
     {
-        statModifiers = new Dictionary<string, float>
-        {
-            { "AttackDamage", ad },
-            { "Armor", armor }
-        };
-
-        Debug.Log("Stats on " + slot + statModifiers.ContainsKey("AttackDamage") + "and" + statModifiers.ContainsKey("Armor"));
+        Equip();
+        Debug.Log("Equipment " + Name + "was used");
     }
 
-    public override void onUse()
+    public void Equip()
     {
-        Debug.Log("Equipment"+name+"Was Equipped in Slot:"+slot);
+        Debug.Log(this.Name + "was Equipped onto slot" + slot);
     }
 
-
-}
-
-public enum EquipSlot
-{
-    Head, Body, Leg, Ring, RightHand, LeftHand
+    public enum EquipSlot
+    {
+        Head,Body,Leg,RightHand,LeftHand,Ring
+    }
 }
