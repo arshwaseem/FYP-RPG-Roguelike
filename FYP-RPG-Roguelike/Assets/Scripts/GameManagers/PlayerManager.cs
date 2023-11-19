@@ -7,10 +7,12 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour
 {
     #region Singleton
-    PlayerManager Instance;
-    StatManagementSystem playerStatSystem;
-    Dictionary<string, float> statList;
-    Equipment[] playerEquipment; 
+    public static PlayerManager Instance;
+    public StatManagementSystem playerStatSystem;
+    public Dictionary<string, float> statList;
+    public Equipment[] playerEquipment;
+    public bool managerRunning;
+    public string PlayerName = "Cal Kestis";
 
     private void Awake()
     {
@@ -29,6 +31,7 @@ public class PlayerManager : MonoBehaviour
         {
             Debug.Log(stat.Key+":"+stat.Value);
         }
+        managerRunning = true;
     }
 
     public void InitializePlayerCharacter()
@@ -52,4 +55,10 @@ public class PlayerManager : MonoBehaviour
     {
         return new float[3] { statList["Strength"], statList["Intelligence"], statList["Tenacity"] }.Max();
     }
+
+    public bool managerStarted()
+    {
+        return managerRunning;
+    }
+
 }
