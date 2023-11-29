@@ -1515,11 +1515,23 @@ MonoBehaviour:
     basicAttack:
       ability_name: defaultAttack
       ability_description: Placeholder
-      abilityValue: 50
-      manaCost: 1
+      abilityValue: 5
+      manaCost: 0
       type: 1
       output: 0
-    charAbilities: []
+    charAbilities:
+    - ability_name: Soul Stone
+      ability_description: Type1
+      abilityValue: 27
+      manaCost: 50
+      type: 0
+      output: 0
+    - ability_name: Soul Stone 2
+      ability_description: Type2
+      abilityValue: 26
+      manaCost: 90
+      type: 0
+      output: 0
     charName: Skeleton
     maxHealth: 100
     currHealth: 100
@@ -1527,8 +1539,9 @@ MonoBehaviour:
     currMana: 100
     limitPoints: 100
     currentLimit: 100
-    speedLimit: 10
+    speedLimit: 2
     currSpeed: 0
+    armor: 0
     characterState: 0
     characterTeam: 1
     PlayerCont: {fileID: 1183714046}
@@ -1551,7 +1564,8 @@ MonoBehaviour:
     createdSuccessfully: 1
     initStatus: 0
     uiStatus: 0
-  targetData: {fileID: 0}
+    isSimulated: 0
+  targetData: {fileID: 2002161619}
 --- !u!4 &1183714047
 Transform:
   m_ObjectHideFlags: 0
@@ -3939,9 +3953,10 @@ MonoBehaviour:
     currentLimit: 0
     speedLimit: 0
     currSpeed: 0
+    armor: 0
     characterState: 0
     characterTeam: 0
-    PlayerCont: {fileID: 0}
+    PlayerCont: {fileID: 2002161619}
     onAttack:
       m_PersistentCalls:
         m_Calls: []
@@ -3961,6 +3976,7 @@ MonoBehaviour:
     createdSuccessfully: 0
     initStatus: 0
     uiStatus: 0
+    isSimulated: 0
   targetData: {fileID: 1183714046}
 --- !u!4 &2002161620
 Transform:

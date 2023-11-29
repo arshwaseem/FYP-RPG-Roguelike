@@ -31,6 +31,8 @@ public class CombatCharacterData
     public float speedLimit = 5;
     public float currSpeed = 0;
 
+    public float armor;
+
     public CharState characterState;
     public CharTeam characterTeam;
     CharState savedState;
@@ -50,6 +52,8 @@ public class CombatCharacterData
 
     public bool initStatus;
     public bool uiStatus;
+
+    public bool isSimulated;
 
     public bool isAttackable
     {
@@ -148,7 +152,7 @@ public class CombatCharacterData
 
     public void characterAttackedDefault()
     {
-        Debug.Log(charName + " was attacked");
+        //Debug.Log(charName + " was attacked");
         if(characterState != CharState.Dead)
         {
             characterState = savedState;
@@ -206,9 +210,11 @@ public class CombatCharacterData
         {
             case AbilityOutput.Damage:
                 targetData.Damage(atk.abilityValue);
+                this.currMana = this.currMana - atk.manaCost;
                 break;
             case AbilityOutput.Heal:
                 Heal(atk.abilityValue);
+                this.currMana = this.currMana - atk.manaCost;
                 break;
         }
         if (characterTeam == CharTeam.Friendly)
@@ -221,7 +227,10 @@ public class CombatCharacterData
     public void Heal(int healAmount)
     {
         currHealth = Mathf.Clamp(currHealth + healAmount, 0, maxHealth);
-        charUi.UpdateHealthBar(currHealth, maxHealth);
+        if (characterTeam == CharTeam.Friendly)
+        {
+            charUi.UpdateHealthBar(currHealth, maxHealth);
+        }
     }
 
     public void Damage(int damageAmount)

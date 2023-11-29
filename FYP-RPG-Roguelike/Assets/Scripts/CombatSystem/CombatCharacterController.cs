@@ -14,8 +14,11 @@ public class CombatCharacterController : MonoBehaviour
     public Coroutine attackQueue = null;
     public Coroutine enemyAttackBehavior;
 
+    Minimax minimax;
+
     public void Start()
     {
+        minimax = new Minimax(this);
         StartCoroutine(combatInitializer());
     }
 
@@ -74,8 +77,8 @@ public class CombatCharacterController : MonoBehaviour
                     }
 
 
-
-                yield return characterData.QueueAttack(characterData.basicAttack);
+                AbilityData bestMove = minimax.ChooseBestMove();
+                yield return characterData.QueueAttack(bestMove);
 
                 yield return null;
             }
