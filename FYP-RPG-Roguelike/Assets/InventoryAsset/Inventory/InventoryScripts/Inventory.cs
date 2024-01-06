@@ -7,10 +7,6 @@ using UnityEngine;
 
 namespace InventorySystem
 {
-    //Author: Jaxon Schauer
-    /// <summary>
-    /// This class creates an Inventory that tracks and controls the inventory list. This class tells the InventoryUIManager what objects each slot holds
-    /// </summary>
     [System.Serializable]
     public class Inventory
     {
@@ -35,9 +31,6 @@ namespace InventorySystem
         private Dictionary<int, InventoryItemEvent> exitDict;
         private Dictionary<int, bool> itemAction;
 
-        /// <summary>
-        /// Assigns essential variables for the Inventory
-        /// </summary>
         public Inventory(GameObject InventoryUIManager, string name, int size)
         {
             this.InventoryUIManager = InventoryUIManager;
@@ -48,9 +41,7 @@ namespace InventorySystem
             InventoryUIManagerInstance = InventoryUIManager.GetComponent<InventoryUIManager>();
         }
 
-        /// <summary>
-        /// Initializes aspects of the inventory that do not transfer into play mode.
-        /// </summary>
+
         public void Init()
         {
             exceptions = new HashSet<string>();
@@ -63,9 +54,7 @@ namespace InventorySystem
             Resize(size);
         }
 
-        /// <summary>
-        /// Resizes the inventory when <see cref="InventoryUIManager.UpdateInventoryUI"/> is called
-        /// </summary>
+
         public void Resize(int newSize)
         {
             if (inventoryList != null)
@@ -107,9 +96,7 @@ namespace InventorySystem
             }
             size = newSize;
         }
-        /// <summary>
-        /// Empties inventory
-        /// </summary>
+
         public void Clear()
         {
             int count = 0;
@@ -138,9 +125,7 @@ namespace InventorySystem
             }
             
         }
-        /// <summary>
-        /// Adds an item to a specified position, updating the <see cref="itemPositions"/> for efficient tracking of the inventory items
-        /// </summary>
+
         public void AddItemPos(int index, InventoryItem item)
         {
             if (inventoryList == null)
@@ -191,10 +176,7 @@ namespace InventorySystem
             }
         }
 
-        /// <summary>
-        /// Takes an item as input
-        /// Adds the item at the lowest possible inventory location, adding it into the <see cref="itemPositions"/> to allow for efficient tracking of the inventory items
-        /// </summary>
+
         public void AddItemAuto(InventoryItem item, int amount = 1)
         {
             if (!CheckAcceptance(item.GetItemType()))
@@ -235,9 +217,7 @@ namespace InventorySystem
 
         }
 
-        /// <summary>
-        /// Adds a new item in the lowest possible inventoryList position
-        /// </summary>
+
         private void AddLinearly(InventoryItem item, int amount = 1)
         {
             int trackAmount = amount;
@@ -267,9 +247,7 @@ namespace InventorySystem
                 }
             }
         }
-        /// <summary>
-        /// Adds itemstypes into <see cref="itemPositions"/> and tracks their positions for quick add/remove and count functions.
-        /// </summary>
+
         private void AddItemHelper(InventoryItem item, int pos, bool invokeEnterExit = true)
         {
             string empty = "Empty";
@@ -327,17 +305,13 @@ namespace InventorySystem
 
         }
 
-        /// <summary>
-        /// Takes as input a position, remove the item from the given inventory position.
-        /// </summary>
+
         public void EraseItemInPosition(int pos, bool invokeEnterExit = true)
         {
             RemoveItemHelper(inventoryList[pos], pos, invokeEnterExit);
         }
 
-        /// <summary>
-        /// Removes items in a specified position.
-        /// </summary>
+
         public void RemoveItemInPosition(int pos, int amount)
         {
             InventoryItem item = inventoryList[pos];
@@ -363,9 +337,6 @@ namespace InventorySystem
             }
         }
 
-        /// <summary>
-        /// Removes items in a specified position, given the item as input
-        /// </summary>
         public void RemoveItemInPosition(InventoryItem item, int amount)
         {
             int pos = item.GetPosition();
@@ -417,9 +388,7 @@ namespace InventorySystem
             }
             
         }
-        /// <summary>
-        /// Handles item when it needs to be erased from inventory
-        /// </summary>
+
         public void RemoveItemHelper(InventoryItem item, int pos, bool invokeEnterExit = true)
         {
             string empty = "Empty";
@@ -440,9 +409,7 @@ namespace InventorySystem
             InventoryUIManagerInstance.UpdateSlot(pos);
 
         }
-        /// <summary>
-        /// Handles item when it needs to be erased from inventory
-        /// </summary>
+
         public void RemoveItemHelper(string item, int pos, bool invokeEnterExit = true)
         {
             string empty = "Empty";
@@ -464,9 +431,7 @@ namespace InventorySystem
 
         }
 
-        /// <summary>
-        /// returns the count of a input item
-        /// </summary>
+
         public int Count(string itemType)
         {
             if (itemType == null)
@@ -487,9 +452,7 @@ namespace InventorySystem
             }
             return itemsTotal;
         }
-        /// <summary>
-        /// takes a string(itemType) as input. Checks whether or not the inventory has room for a item
-        /// </summary>
+
         public bool Full(string item)
         {
             string empty = "Empty";
@@ -520,9 +483,7 @@ namespace InventorySystem
             return true;
         }
 
-        /// <summary>
-        /// Fills the inventory with empty items 
-        /// </summary>
+
         public void FillInventory(int size, bool highlightable = false)
         {
             if (inventoryList == null)
@@ -537,9 +498,6 @@ namespace InventorySystem
             }
         }
 
-        /// <summary>
-        /// Returns the item at a specific index of the inventory, returning the closest value if out of range
-        /// </summary>
         public InventoryItem InventoryGetItem(int index)
         {
             if (inventoryList == null)
@@ -560,9 +518,7 @@ namespace InventorySystem
             return inventoryList[index];
         }
 
-        /// <summary>
-        /// Sets up values for the inventory to determine if an item should be accepted or rejected from the inventory
-        /// </summary>
+
         public void SetupItemAcceptance(bool acceptAll, bool rejectAll, List<string> exceptions)
         {
             if (acceptAll && !rejectAll)
@@ -591,9 +547,7 @@ namespace InventorySystem
                 }
             }
         }
-        /// <summary>
-        /// Prints <see cref="itemPositions"/>
-        /// </summary>
+
         public Dictionary<string, List<int>> TestPrintItemPosDict()
         {
             StringBuilder output = new StringBuilder();
@@ -614,9 +568,7 @@ namespace InventorySystem
             return itemPositions;
         }
 
-        /// <summary>
-        /// Returns a bool, true if an item can be transfered into an inventory and false otherwise.
-        /// </summary>
+
         public bool CheckAcceptance(string itemType)
         {
             if ((acceptAll && rejectAll) || (!acceptAll && !rejectAll))
