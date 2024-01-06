@@ -13,6 +13,8 @@ public class BattleManager : MonoBehaviour
 
     public List<CombatCharacterController> EnemyCharacters = new List<CombatCharacterController>();
 
+    public GameObject selectorGraphic;
+
     private void Awake()
     {
         Instance = this;
@@ -22,6 +24,43 @@ public class BattleManager : MonoBehaviour
     {
         FriendlyCharacters = FindObjectsOfType<CombatCharacterController>().ToList().FindAll(x => x.characterData.characterTeam == CharTeam.Friendly);
         EnemyCharacters = FindObjectsOfType<CombatCharacterController>().ToList().FindAll(x => x.characterData.characterTeam == CharTeam.Enemy);
+        Debug.Log("Enemy "+EnemyCharacters.First().characterData.charName+" was found");
+    }
+
+    public void SelectCharacter (CombatCharacterData newChar)
+    {
+        setTargetGraphics(currentCharacter);
+    }
+
+    public void SelectCharacterTarget(CombatCharacterData tgt)
+    {
+        if(currentCharacter != null)
+        {
+            if (currentCharacter.characterData.isReadyForAction)
+            {
+                currentCharacter.characterData.targetData = tgt;
+                setTargetGraphics(currentCharacter);
+            }
+        }
+    }
+
+    public void setTargetGraphics(CombatCharacterController chC)
+    {
+        if(chC.characterData.targetData == null)
+        {
+            SelectorStatus(false);
+        }
+        else
+        {
+            SelectorStatus(true);
+            var _chartgt = chC.characterData.targetData.PlayerCont;
+            selectorGraphic.transform.position = new Vector3(_chartgt.transform.position.x, _chartgt.transform.position.y + 2, _chartgt.transform.position.z);
+        }
+    }
+
+    public void SelectorStatus(bool status)
+    {
+        selectorGraphic.SetActive(status);
     }
 
     public void DoBasicAttack()
@@ -31,15 +70,46 @@ public class BattleManager : MonoBehaviour
             //Debug.Log("Is Ready for Action");
             if (currentCharacter.characterData.characterTeam == CharTeam.Friendly)
             {
-                Debug.Log("Player performed an action");
-                if (currentCharacter.characterData.targetData.isAttackable)
+                if(currentCharacter.characterData.targetData != null)
                 {
-                    if (currentCharacter.attackQueue == null)
-                        currentCharacter.attackQueue = StartCoroutine(currentCharacter.characterData.QueueAttack(currentCharacter.characterData.basicAttack));
+                    Debug.Log("Player performed an action");
+                    if (currentCharacter.characterData.targetData.isAttackable)
+                    {
+                        if (currentCharacter.attackQueue == null)
+                            currentCharacter.attackQueue = StartCoroutine(currentCharacter.characterData.QueueAttack(currentCharacter.characterData.basicAttack));
+                    }
                 }
+                
             }
         }
         
+    }
+
+    public void DoLimitBurst()
+    {
+        if (currentCharacter.characterData.isReadyForLB)
+        {
+            //Debug.Log("Is Ready for Action");
+            if (currentCharacter.characterData.characterTeam == CharTeam.Friendly)
+            {
+                if (currentCharacter.characterData.targetData != null)
+                {
+                    Debug.Log("Player performed an action");
+                    if (currentCharacter.characterData.targetData.isAttackable)
+                    {
+                        if (currentCharacter.attackQueue == null)
+                        {
+                            currentCharacter.attackQueue = StartCoroutine(currentCharacter.characterData.QueueAttack(currentCharacter.characterData.limitBurst));
+                            currentCharacter.characterData.currentLimit = 0;
+                            currentCharacter.characterData.charUi.UpdateLimitBar(0);
+                        }
+                            
+                    }
+                }
+
+            }
+        }
+
     }
 
     public CombatCharacterController RandomFriendly

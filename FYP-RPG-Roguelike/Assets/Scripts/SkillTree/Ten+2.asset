@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a9ad9009a5414f34abab1796b348f0da, type: 3}
+  m_Name: Ten+2
+  m_EditorClassIdentifier: 
+  isParentSkill: 0
+  skillName: Tenacity+2
+  skillDesc: Increase Tenacity By 2
+  skillImg: {fileID: 21300000, guid: 83867e6aae1e5f64aa4a99a4e79b693e, type: 3}
+  skillEnable: {fileID: 21300000, guid: dfa2bfe511765de45936510d4ba2ef52, type: 3}
+  skillValue: 2
+  skillAffector: Tenacity

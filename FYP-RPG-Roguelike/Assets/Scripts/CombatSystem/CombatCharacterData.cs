@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
+using UnityEngine.AI;
 
 [System.Serializable]
 public class CombatCharacterData
@@ -15,6 +16,7 @@ public class CombatCharacterData
     public CharacterUIData charUi = new CharacterUIData();
     public Dictionary<string, float> charStats;
     public AbilityData basicAttack;
+    public AbilityData limitBurst;
     public List<AbilityData> charAbilities;
 
     public string charName;
@@ -71,6 +73,14 @@ public class CombatCharacterData
         }
     }
 
+    public bool isReadyForLB
+    {
+        get
+        {
+            return (currentLimit >= limitPoints);
+        }
+    }
+
     public bool isAlive
     {
         get
@@ -105,13 +115,7 @@ public class CombatCharacterData
 
     void onReadyDefault()
     {
-        if(characterTeam == CharTeam.Friendly) { 
-        foreach (var item in CombatUIManager.Instance.ActionWindow.GetComponentsInChildren<UnityEngine.UI.Button>())
-        {
-            item.interactable = true;
-        }
-            BattleManager.Instance.currentCharacter = this.PlayerCont;
-        }
+        SelectCharacter();
     }
 
     void OnAttackQueueDefault()
@@ -125,6 +129,38 @@ public class CombatCharacterData
         {
             item.interactable = false;
         }
+    }
+
+    public void SelectCharacter()
+    {
+        if (!isReadyForAction)
+            return;
+
+        CombatUIManager.Instance.ActionWindow.SetActive(true);
+        foreach (var item in CombatUIManager.Instance.ActionWindow.GetComponentsInChildren<UnityEngine.UI.Button>())
+        {
+            item.interactable = true;
+        }
+
+        foreach (var item in GameObject.FindObjectsOfType<CombatCharacterController>())
+        {
+            if (item.characterData.characterTeam == CharTeam.Enemy)
+                item.characterData.ResetUINameText();
+        }
+        BattleManager.Instance.currentCharacter = PlayerCont;
+    }
+
+    /*public void spawnParticleFX(AbilityData atk, CombatCharacterController charCont)
+    {
+        if(atk.particleFX != null && atk.type == AbilityType.Ranged)
+        {
+            charCont.spawnParticleOnTarget(charCont, atk.particleFX);
+        }
+    }*/
+
+    public void ResetUINameText()
+    {
+        return;
     }
 
     public void Init()
@@ -199,6 +235,18 @@ public class CombatCharacterData
         }
 
         characterState = CharState.Attacking;
+
+        /*spawnParticleFX(atk, targetData.PlayerCont);*/
+
+        if(atk != limitBurst)
+        {
+            PlayerCont.AttackAnimation();
+        }
+        else
+        {
+            PlayerCont.LimitBurstAnimation();
+        }
+        //CombatUIManager.Instance.setAbilityText(atk.ability_name, characterTeam);
 
         targetData.SaveCharacterState();
         targetData.characterState = CharState.Attacked;

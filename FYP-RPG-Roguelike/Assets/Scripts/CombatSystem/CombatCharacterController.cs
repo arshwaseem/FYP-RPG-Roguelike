@@ -6,8 +6,9 @@ using UnityEngine;
 [System.Serializable]
 public class CombatCharacterController : MonoBehaviour
 {
+    public Animator charAnimator;
+
     public CombatCharacterData characterData;
-    public CombatCharacterController targetData;
     public WaitUntil isDataReady;
 
     public Coroutine CharacterBaseLoop;
@@ -16,6 +17,11 @@ public class CombatCharacterController : MonoBehaviour
 
     Minimax minimax;
 
+    public void Awake()
+    {
+        characterData.PlayerCont = this;
+        charAnimator = GetComponent<Animator>();
+    }
     public void Start()
     {
         minimax = new Minimax(this);
@@ -29,6 +35,35 @@ public class CombatCharacterController : MonoBehaviour
             StopCoroutine(attackQueue);
             attackQueue = null;
         }
+    }
+
+    public void OnMouseDown()
+    {
+        if (characterData.characterTeam == CharTeam.Friendly)
+            return;
+
+        Debug.Log(gameObject.name + "was clicked");
+        BattleManager.Instance.SelectCharacterTarget(characterData);
+    }
+
+    public void AttackAnimation()
+    {
+        charAnimator.Play("Attack",0);
+    }
+
+    public void LimitBurstAnimation()
+    {
+        charAnimator.Play("Limit", 0);
+    }
+
+    public void spawnParticleOnTarget(CombatCharacterController charCont, GameObject particle)
+    {
+        GameObject tmpParticle = Instantiate(particle);
+        tmpParticle.transform.position = charCont.transform.position;
+
+        ParticleSystem particleComponent = tmpParticle.GetComponent<ParticleSystem>();
+
+        Destroy(tmpParticle, particleComponent.main.duration);
     }
 
     public void StopAll()
@@ -53,8 +88,10 @@ public class CombatCharacterController : MonoBehaviour
 
     public IEnumerator AttackRandomFriendly()
     {
+        Debug.Log("enemy behavior started");
         if (characterData.characterTeam == CharTeam.Enemy)
         {
+            Debug.Log("Enemy " + characterData.charName + " Time is " + characterData.currSpeed);
             while (characterData.isAlive)
             {
 
@@ -95,10 +132,10 @@ public class CombatCharacterController : MonoBehaviour
         }
         yield return new WaitUntil(() => characterData.createdSuccessfully);
         characterData.Init();
-        if (characterData.characterTeam == CharTeam.Friendly)
+        /*if (characterData.characterTeam == CharTeam.Friendly)
         {
             characterData.targetData = targetData.characterData;
-        }
+        }*/
         CharacterBaseLoop = StartCoroutine(characterData.CharacterLoop());
         enemyAttackBehavior = StartCoroutine(AttackRandomFriendly());
 

@@ -41,7 +41,7 @@ public class PlayerManager : MonoBehaviour
 
         var add_stats = new Dictionary<string, float> {{"TrueHealth", statList["BaseHealth"] + (statList["BaseHealth"]*statList["Strength"]/100) },
             {"TrueMana", statList["BaseMana"] + (statList["BaseMana"]*statList["Intelligence"]/100) },
-            { "TrueAttackDamange", statList["BaseAttackDamage"] + (statList["BaseAttackDamage"]*getHighestStat(statList)/100) },
+            { "TrueAttackDamage", statList["BaseAttackDamage"] + (statList["BaseAttackDamage"]*getHighestStat(statList)/100) },
             {"TrueStatusResist", statList["BaseStatusResist"]+(statList["BaseStatusResist"]*statList["Tenacity"]/100) },
             {"TrueArmor", statList["BaseArmor"] } };
 

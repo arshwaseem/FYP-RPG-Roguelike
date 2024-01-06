@@ -21,6 +21,10 @@ public class CombatUIManager : MonoBehaviour
     public GameObject magicContainer;
     public GameObject magicPrefab;
     public GameObject magicDescWindow;
+
+    [Header("Ability Texts")]
+    public GameObject AbilityText;
+    public GameObject EnemyAbilityText;
     
 
     public void FillMagicWindow()
@@ -58,6 +62,19 @@ public class CombatUIManager : MonoBehaviour
     public void HideMagicUI()
     {
         magicContainer.SetActive(false);
+    }
+
+    public void setAbilityText(string abName, CharTeam team)
+    {
+        switch (team)
+        {
+            case CharTeam.Friendly:
+                AbilityText.GetComponent<TextMeshPro>().text = abName;
+                break;
+            case CharTeam.Enemy:
+                EnemyAbilityText.GetComponent<TextMeshPro>().text = abName;
+                break;
+        }
     }
 
     public void ClearMagicWindow()

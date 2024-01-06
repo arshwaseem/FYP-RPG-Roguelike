@@ -14,10 +14,12 @@ public class AbilityData
     public AbilityType type = AbilityType.Melee;
     public AbilityOutput output = AbilityOutput.Damage;
 
+
     //TODO: VFX
+    //public GameObject particleFX;
+
 
 }
-
 public enum AbilityType
 {
     Ranged, Melee
