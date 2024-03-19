@@ -19,3 +19,4 @@ MonoBehaviour:
   skillEnable: {fileID: 21300000, guid: b9d0bdc84e70fbd459d28d964fcf16e6, type: 3}
   skillValue: 6
   skillAffector: Intelligence
+  skillCost: 1

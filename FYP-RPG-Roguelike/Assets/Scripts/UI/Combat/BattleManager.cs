@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using UnityEngine.SceneManagement;
+using TMPro;
 
 public class BattleManager : MonoBehaviour
 {
@@ -46,6 +48,11 @@ public class BattleManager : MonoBehaviour
 
     public void setTargetGraphics(CombatCharacterController chC)
     {
+        if(chC == null)
+        {
+            return;
+        }
+
         if(chC.characterData.targetData == null)
         {
             SelectorStatus(false);
@@ -72,12 +79,9 @@ public class BattleManager : MonoBehaviour
             {
                 if(currentCharacter.characterData.targetData != null)
                 {
-                    Debug.Log("Player performed an action");
-                    if (currentCharacter.characterData.targetData.isAttackable)
-                    {
-                        if (currentCharacter.attackQueue == null)
-                            currentCharacter.attackQueue = StartCoroutine(currentCharacter.characterData.QueueAttack(currentCharacter.characterData.basicAttack));
-                    }
+                    Debug.Log("Plauyer did Action");
+                    if (currentCharacter.characterData.CanQueueAttack)
+                        currentCharacter.attackQueue = StartCoroutine(currentCharacter.characterData.QueueAttack(currentCharacter.characterData.basicAttack));
                 }
                 
             }
@@ -95,15 +99,11 @@ public class BattleManager : MonoBehaviour
                 if (currentCharacter.characterData.targetData != null)
                 {
                     Debug.Log("Player performed an action");
-                    if (currentCharacter.characterData.targetData.isAttackable)
+                    if (currentCharacter.characterData.CanQueueAttack)
                     {
-                        if (currentCharacter.attackQueue == null)
-                        {
-                            currentCharacter.attackQueue = StartCoroutine(currentCharacter.characterData.QueueAttack(currentCharacter.characterData.limitBurst));
-                            currentCharacter.characterData.currentLimit = 0;
-                            currentCharacter.characterData.charUi.UpdateLimitBar(0);
-                        }
-                            
+                        currentCharacter.attackQueue = StartCoroutine(currentCharacter.characterData.QueueAttack(currentCharacter.characterData.limitBurst));
+                        currentCharacter.characterData.currentLimit = 0;
+                        currentCharacter.characterData.charUi.UpdateLimitBar(0);
                     }
                 }
 
@@ -126,12 +126,26 @@ public class BattleManager : MonoBehaviour
         {
             Debug.Log("Victory");
             stopAllChars();
+            float xpEarned = 0;
+            foreach (CombatCharacterController enemy in EnemyCharacters)
+            {
+                xpEarned += enemy.characterData.xpDrop;
+            }
+            PlayerPrefs.SetFloat("xpErn", xpEarned);
+            DisplayAlertWindow("Victory!");
+            PlayerManager.Instance.xpEarned = xpEarned;
+            PlayerManager.Instance.justFinishedFight = true;
+            Invoke("hideAlerWindow", 3f);
+            SceneManager.LoadSceneAsync("End");
+
         }
 
         if(!isFriendlyAlive && isEnemyAlive)
         {
             Debug.Log("Defeat");
             stopAllChars();
+            DisplayAlertWindow("Defeat!");
+            Invoke("hideAlertWindow", 3f);
         }
     }
 
@@ -180,6 +194,19 @@ public class BattleManager : MonoBehaviour
 
             return enemyAlive;
         }
+    }
+
+    public void DisplayAlertWindow(string result)
+    {
+        GameObject AlertP = GameObject.FindGameObjectWithTag("CombALC");
+        GameObject AlertWindow = AlertP.transform.Find("AlertsCanv").gameObject;
+        AlertWindow.GetComponentInChildren<TextMeshProUGUI>().SetText(result);
+        AlertP.SetActive(true);
+    }
+    public void hideAlertWindow()
+    {
+        GameObject AlertWindow = GameObject.FindGameObjectWithTag("CombALC"); ;
+        AlertWindow.SetActive(false);
     }
 
 }

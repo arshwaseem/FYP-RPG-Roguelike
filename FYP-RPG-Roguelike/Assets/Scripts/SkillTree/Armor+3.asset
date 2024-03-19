@@ -19,3 +19,4 @@ MonoBehaviour:
   skillEnable: {fileID: 21300000, guid: 628bfd77e437c5e41924568a2ecbda59, type: 3}
   skillValue: 3
   skillAffector: BaseArmor
+  skillCost: 1

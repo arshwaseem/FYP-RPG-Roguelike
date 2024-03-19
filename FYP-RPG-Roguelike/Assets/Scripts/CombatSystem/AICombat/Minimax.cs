@@ -33,7 +33,7 @@ public class Minimax
 
     public bool canCast(AbilityData _ability)
     {
-        if (charCont.characterData.currMana > _ability.manaCost)
+        if (charCont.characterData.currMana >= _ability.manaCost)
         {
             return true;
         }

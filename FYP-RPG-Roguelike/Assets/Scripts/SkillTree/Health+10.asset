@@ -19,3 +19,4 @@ MonoBehaviour:
   skillEnable: {fileID: 21300000, guid: 6897ff75e936d42419deeb3bc3c654af, type: 3}
   skillValue: 10
   skillAffector: BaseHealth
+  skillCost: 1

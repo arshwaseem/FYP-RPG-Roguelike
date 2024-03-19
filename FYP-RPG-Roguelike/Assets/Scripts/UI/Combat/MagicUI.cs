@@ -18,10 +18,14 @@ public class MagicUI : MonoBehaviour, IPointerDownHandler, IPointerEnterHandler,
     public IEnumerator OnPointerDownCoroutine(AbilityData ability)
     {
         var temp2 = BattleManager.Instance.currentCharacter;
-        if (temp2.attackQueue == null)
+        if (temp2.characterData.CanQueueAttack)
         {
-            temp2.attackQueue = StartCoroutine(temp2.characterData.QueueAttack(ability));
-            yield return temp2.attackQueue;  // Wait for the QueueAttack coroutine to finish
+            if(BattleManager.Instance.currentCharacter.characterData.currMana >= ability.manaCost)
+            {
+                temp2.attackQueue = StartCoroutine(temp2.characterData.QueueAttack(ability));
+                yield return temp2.attackQueue;  // Wait for the QueueAttack coroutine to finish
+            }
+
         }
 
         CombatUIManager.Instance.HideMagicUI();

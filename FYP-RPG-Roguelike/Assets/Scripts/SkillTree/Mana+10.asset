@@ -19,3 +19,4 @@ MonoBehaviour:
   skillEnable: {fileID: 21300000, guid: 1d10065e0fd192847b1efc9703c9bed3, type: 3}
   skillValue: 10
   skillAffector: BaseMana
+  skillCost: 1

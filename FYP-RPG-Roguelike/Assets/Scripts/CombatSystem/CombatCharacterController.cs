@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.ParticleSystem;
 
 
 [System.Serializable]
@@ -14,6 +15,9 @@ public class CombatCharacterController : MonoBehaviour
     public Coroutine CharacterBaseLoop;
     public Coroutine attackQueue = null;
     public Coroutine enemyAttackBehavior;
+
+    public CombatCharacterController cachedtarget;
+    public AbilityData lastAbilityUsed;
 
     Minimax minimax;
 
@@ -56,14 +60,36 @@ public class CombatCharacterController : MonoBehaviour
         charAnimator.Play("Limit", 0);
     }
 
-    public void spawnParticleOnTarget(CombatCharacterController charCont, GameObject particle)
+    public void spawnParticleOnTarget()
     {
-        GameObject tmpParticle = Instantiate(particle);
-        tmpParticle.transform.position = charCont.transform.position;
 
-        ParticleSystem particleComponent = tmpParticle.GetComponent<ParticleSystem>();
+        if (lastAbilityUsed.particleFX != null)
+        {
+            GameObject tmpParticle = Instantiate(lastAbilityUsed.particleFX);
+            tmpParticle.transform.position = cachedtarget.transform.position;
 
-        Destroy(tmpParticle, particleComponent.main.duration);
+            ParticleSystem particleComponent = tmpParticle.GetComponent<ParticleSystem>();
+
+            Destroy(tmpParticle, particleComponent.main.duration);
+        }
+        
+    }
+
+    public void AttackingTarger()
+    {
+        characterData.characterState = CharState.Attacking;
+        characterData.targetData.SaveCharacterState();
+        characterData.targetData.characterState = CharState.Attacked;
+    }
+
+    public void AttackedTarget()
+    {
+        characterData.characterState = CharState.Idle;
+    }
+
+    public void spawnParticleFX()
+    {
+        
     }
 
     public void StopAll()
@@ -122,15 +148,21 @@ public class CombatCharacterController : MonoBehaviour
 
         }
     }
-    public IEnumerator combatInitializer()
-    {
+    public IEnumerator combatInitializer(){
         if (characterData.characterTeam == CharTeam.Friendly)
         {
             yield return new WaitUntil(PlayerManager.Instance.managerStarted);
-            characterData = new CombatCharacterData(PlayerManager.Instance.PlayerName, PlayerManager.Instance.statList, CharTeam.Friendly);
+            characterData.charName = PlayerManager.Instance.playerStats.name;
+            characterData.maxHealth = PlayerManager.Instance.playerStats.maxHP;
+            characterData.currHealth = PlayerManager.Instance.playerStats.currentHP;
+            characterData.maxMana = PlayerManager.Instance.playerStats.maxMana;
+            characterData.currMana = PlayerManager.Instance.playerStats.currentMana;
+            characterData.armor = PlayerManager.Instance.playerStats.Armor;
+            characterData.statusResist = PlayerManager.Instance.playerStats.statusResist;
+            characterData.spellAmp = PlayerManager.Instance.playerStats.spellAmp;
             characterData.PlayerCont = this;
         }
-        yield return new WaitUntil(() => characterData.createdSuccessfully);
+        //yield return new WaitUntil(() => characterData.createdSuccessfully);
         characterData.Init();
         /*if (characterData.characterTeam == CharTeam.Friendly)
         {

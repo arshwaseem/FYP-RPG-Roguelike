@@ -16,7 +16,7 @@ public class AbilityData
 
 
     //TODO: VFX
-    //public GameObject particleFX;
+    public GameObject particleFX;
 
 
 }

@@ -37,64 +37,78 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         Debug.Log("SkillUnlockCalled");
         if (canBeUnlocked == true)
         {
-            Debug.Log("Skill can be unlocked proceeding");
-            if (!isUnlocked)
+            if (PlayerManager.Instance.playerStats.skillPoints >= skill.skillCost)
             {
-                var stats = PlayerManager.Instance.statList;
-
-                if (children != null)
+                Debug.Log("Skill can be unlocked proceeding");
+                if (!isUnlocked)
                 {
-                    foreach (var child in children)
+                    var stats = PlayerManager.Instance.playerStats;
+
+                    if (children != null)
                     {
-                        child.canBeUnlocked = true;
+                        foreach (var child in children)
+                        {
+                            child.canBeUnlocked = true;
+                        }
+                    }
+
+                    isUnlocked = true;
+                    PlayerManager.Instance.playerStats.skillPoints -= skill.skillCost;
+
+                    if (skillAffector == "BaseHealth")
+                    {
+                        stats.maxHP -= stats.baseHP;
+                        stats.baseHP += skillValue;
+                        stats.maxHP += stats.baseHP;
+                    }
+                    if (skillAffector == "BaseMana")
+                    {
+                        stats.maxMana -=stats.baseMana;
+                        stats.baseMana += skillValue;
+                        stats.maxMana += stats.baseMana;
+                    }
+                    if (skillAffector == "Strength")
+                    {
+                        stats.Str += skillValue;
+                        stats.maxHP = stats.baseHP + (stats.baseHP * stats.Str / 100);
+                    }
+                    if (skillAffector == "Intelligence")
+                    {
+                        stats.Int += skillValue;
+                        stats.maxMana = stats.baseMana + (stats.baseMana * stats.Int / 100);
+                    }
+                    if (skillAffector == "Tenacity")
+                    {
+                        stats.Ten += skillValue;
+                        stats.statusResist = stats.statusResist + (stats.statusResist * stats.Ten / 100);
+                    }
+                    if (skillAffector == "Strength" || skillAffector == "Intelligence" || skillAffector == "Tenacity")
+                    {
+                        if (HighestStat().Key == skillAffector)
+                        {
+                            stats.trueDamage = stats.baseDamage + (stats.baseDamage * (HighestStat().Value / 100));
+                        }
+                    }
+                    if (skillAffector == "BaseAttackDamage")
+                    {
+                        stats.trueDamage -= stats.baseDamage;
+                        stats.baseDamage = +skillValue;
+                        stats.trueDamage += stats.baseDamage;
+                    }
+                    if (skillAffector == "BaseArmor")
+                    {
+                        stats.Armor += skillValue;
                     }
                 }
-
-                isUnlocked = true;
-
-                if (skillAffector == "BaseHealth")
-                {
-                    stats["TrueHealth"] -= stats["BaseHealth"];
-                    stats["BaseHealth"] += skillValue;
-                    stats["TrueHealth"] += stats["BaseHealth"];
-                }
-                if (skillAffector == "BaseMana")
-                {
-                    stats["TrueMana"] += skillValue;
-                }
-                if (skillAffector == "Strength")
-                {
-                    stats[skillAffector] += skillValue;
-                    stats["TrueHealth"] = stats["BaseHealth"] + (stats["BaseHealth"] * stats["Strength"] / 100);
-                }
-                if (skillAffector == "Intelligence")
-                {
-                    stats[skillAffector] += skillValue;
-                    stats["TrueMana"] = stats["BaseMana"] + (stats["BaseMana"] * stats["Strength"] / 100);
-                }
-                if (skillAffector == "Tenacity")
-                {
-                    stats[skillAffector] += skillValue;
-                    stats["TrueStatusResist"] = stats["BaseStatusResist"] + (stats["BaseStatusResist"] * stats["Tenacity"] / 100);
-                }
-                if (skillAffector == "Strength" || skillAffector == "Intelligence" || skillAffector == "Tenacity")
-                {
-                    if (HighestStat().Key == skillAffector)
-                    {
-                        stats["TrueAttackDamage"] = stats["BaseAttackDamage"] + (stats["BaseAttackDamage"] * (HighestStat().Value / 100));
-                    }
-                }
-                if (skillAffector == "BaseAttackDamage")
-                {
-                    stats["TrueAttackDamage"] -= stats["BaseAttackDamage"];
-                    stats["BaseAttackDamage"] = +skillValue;
-                    stats["TrueAttackDamage"] += stats["BaseAttackDamage"];
-                }
-                if (skillAffector == "BaseArmor")
-                {
-                    stats["BaseArmor"] += skillValue;
-                    stats["TrueArmor"] = stats["BaseArmor"];
-                }
+            }
+            else
+            {
+                GameObject AlertWindow = transform.root.Find("Alert").gameObject;
+                string defText = AlertWindow.GetComponent<TextMeshPro>().text;
+                AlertWindow.GetComponent<TextMeshPro>().SetText("Not Enough Skill Points");
+                AlertWindow.SetActive(true);
+                Invoke("hideAlert", 3f);
+                GameObject.Find("Alert").GetComponent<TextMeshPro>().text = defText;
             }
         }
         else
@@ -109,8 +123,8 @@ public class SkillButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public KeyValuePair<string,float> HighestStat()
     {
-        var stats = new Dictionary<string, float> { {"Strength", PlayerManager.Instance.statList["Strength"] }, { "Intelligence", PlayerManager.Instance.statList["Intelligence"] },
-        {"Tenacity", PlayerManager.Instance.statList["Tenacity"] }};
+        var stats = new Dictionary<string, float> { {"Strength", PlayerManager.Instance.playerStats.Str }, { "Intelligence", PlayerManager.Instance.playerStats.Int },
+        {"Tenacity", PlayerManager.Instance.playerStats.Ten }};
         return stats.OrderByDescending(kv => kv.Value).First();
     }
 

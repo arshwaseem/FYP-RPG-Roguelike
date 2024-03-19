@@ -69,10 +69,10 @@ public class CombatUIManager : MonoBehaviour
         switch (team)
         {
             case CharTeam.Friendly:
-                AbilityText.GetComponent<TextMeshPro>().text = abName;
+                AbilityText.GetComponent<TextMeshProUGUI>().SetText(abName);
                 break;
             case CharTeam.Enemy:
-                EnemyAbilityText.GetComponent<TextMeshPro>().text = abName;
+                EnemyAbilityText.GetComponent<TextMeshProUGUI>().SetText(abName);
                 break;
         }
     }

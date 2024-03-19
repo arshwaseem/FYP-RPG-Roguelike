@@ -16,5 +16,6 @@ public class Skill : ScriptableObject
     public Sprite skillEnable;
     public float skillValue;
     public string skillAffector;
+    public int skillCost;
 
 }

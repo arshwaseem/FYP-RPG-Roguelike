@@ -14,7 +14,6 @@ using UnityEngine.AI;
 public class CombatCharacterData
 {
     public CharacterUIData charUi = new CharacterUIData();
-    public Dictionary<string, float> charStats;
     public AbilityData basicAttack;
     public AbilityData limitBurst;
     public List<AbilityData> charAbilities;
@@ -35,12 +34,20 @@ public class CombatCharacterData
 
     public float armor;
 
+    public float xpDrop;
+
+    public float statusResist;
+
+    public float spellAmp;
+
     public CharState characterState;
     public CharTeam characterTeam;
     CharState savedState;
 
     public CombatCharacterData targetData;
     public CombatCharacterController PlayerCont;
+
+    
 
     public UnityEvent onAttack;
     public UnityEvent onAttackQueue;
@@ -57,6 +64,13 @@ public class CombatCharacterData
 
     public bool isSimulated;
 
+    public bool CanQueueAttack
+    {
+        get
+        {
+            return characterState == CharState.TryingAttack || PlayerCont.attackQueue == null;
+        }
+    }
     public bool isAttackable
     {
         get
@@ -89,25 +103,6 @@ public class CombatCharacterData
         }
     }
 
-    public CombatCharacterData(string name, Dictionary<string, float> stats, CharTeam team)
-    {
-        this.charName = name;
-        charStats = stats;
-        maxHealth = charStats["TrueHealth"];
-        currHealth = maxHealth;
-
-        maxMana = charStats["TrueMana"];
-        currMana = maxMana;
-
-        limitPoints = 100f;
-        currentLimit = 0;
-
-        characterTeam = team;
-
-        speedLimit = 5;
-        createdSuccessfully = true;
-    }
-
     public void SaveCharacterState()
     {
         savedState = characterState;
@@ -121,6 +116,9 @@ public class CombatCharacterData
     void OnAttackQueueDefault()
     {
         currSpeed = 0;
+
+        if(characterTeam == CharTeam.Friendly)
+        charUi.UpdateTimeBar(currSpeed);
     }
 
     public void ResetActionsContainer()
@@ -150,13 +148,7 @@ public class CombatCharacterData
         BattleManager.Instance.currentCharacter = PlayerCont;
     }
 
-    /*public void spawnParticleFX(AbilityData atk, CombatCharacterController charCont)
-    {
-        if(atk.particleFX != null && atk.type == AbilityType.Ranged)
-        {
-            charCont.spawnParticleOnTarget(charCont, atk.particleFX);
-        }
-    }*/
+
 
     public void ResetUINameText()
     {
@@ -167,7 +159,7 @@ public class CombatCharacterData
     {
         if (characterTeam == CharTeam.Friendly)
         {
-            charUi.InitUI((int)this.maxHealth, (int)this.currHealth, (int)this.maxMana, (int)this.currMana, (int)this.charStats["Strength"], (int)this.charStats["Intelligence"], (int)this.charStats["Tenacity"], limitPoints, currentLimit, speedLimit);
+            charUi.InitUI((int)this.maxHealth, (int)this.currHealth, (int)this.maxMana, (int)this.currMana, (int)PlayerManager.Instance.playerStats.Str, (int)PlayerManager.Instance.playerStats.Int, (int)PlayerManager.Instance.playerStats.Ten, limitPoints, currentLimit, speedLimit);
             ResetActionsContainer();
             onJustReady.AddListener(onReadyDefault);
         }
@@ -214,9 +206,10 @@ public class CombatCharacterData
 
     public IEnumerator QueueAttack(AbilityData atk)
     {
-        if (!isAlive || characterState == CharState.TryingAttack)
+
+
+        if (!isAlive || characterState == CharState.Finished || targetData == null)
         {
-            Debug.Log("Character is dead or trying to attack, coroutine aborted.");
             PlayerCont.ClearAttackQueue();
             yield break;
         }
@@ -226,19 +219,16 @@ public class CombatCharacterData
 
         onAttackQueue.Invoke();
 
-        yield return new WaitUntil(() => { Debug.Log("Inside Wait until: " + targetData.isAttackable); return targetData.isAttackable; });
+        yield return new WaitUntil(() => targetData.isAttackable);
 
         if (!targetData.isAlive)
-        {
-            Debug.Log("Target is dead, coroutine aborted.");
             yield break;
-        }
 
-        characterState = CharState.Attacking;
 
-        /*spawnParticleFX(atk, targetData.PlayerCont);*/
+        PlayerCont.cachedtarget = targetData.PlayerCont;
+        PlayerCont.lastAbilityUsed = atk;
 
-        if(atk != limitBurst)
+        if (atk != limitBurst)
         {
             PlayerCont.AttackAnimation();
         }
@@ -246,10 +236,19 @@ public class CombatCharacterData
         {
             PlayerCont.LimitBurstAnimation();
         }
-        //CombatUIManager.Instance.setAbilityText(atk.ability_name, characterTeam);
 
-        targetData.SaveCharacterState();
-        targetData.characterState = CharState.Attacked;
+        //spawnParticleFX(atk, targetData.PlayerCont);
+        yield return new WaitUntil(() => characterState == CharState.Attacking);
+
+        
+        if (CombatUIManager.Instance != null)
+        {
+            CombatUIManager.Instance.setAbilityText(atk.ability_name, characterTeam);
+        }
+        else
+        {
+            Debug.LogError("CMUI is null");
+        }
 
         Debug.Log("Attacked with " + atk.ability_name + " to " + targetData.charName);
 
@@ -284,7 +283,7 @@ public class CombatCharacterData
     public void Damage(int damageAmount)
     {
         currHealth -= damageAmount;
-        if (currHealth <= 0)
+        if (currHealth <= 0 && characterState != CharState.Dead)
         {
             currHealth = 0;
             characterState = CharState.Dead;
@@ -305,7 +304,7 @@ public class CombatCharacterData
             while (currSpeed < speedLimit)
             {
 
-                yield return new WaitUntil(()=> characterState != CharState.TryingAttack);
+                yield return new WaitUntil(()=> characterState != CharState.TryingAttack && characterState != CharState.Attacking);
 
                 currSpeed += Time.deltaTime;
                 if (characterTeam == CharTeam.Friendly)
@@ -325,13 +324,8 @@ public class CombatCharacterData
             onJustReady.Invoke();
 
             yield return new WaitUntil(() => characterState == CharState.Attacking);
-
-            //AnimEventsHere
-            if(characterState != CharState.Dead)
-            {
-                characterState = CharState.Idle;
-            }
             yield return new WaitUntil(() => characterState == CharState.Idle);
+            if(characterTeam == CharTeam.Friendly)
             ResetActionsContainer();
         }
     }
