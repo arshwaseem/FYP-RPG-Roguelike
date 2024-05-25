@@ -10,28 +10,38 @@ using Scene = UnityEngine.SceneManagement.Scene;
 public class PlayerManager : MonoBehaviour
 {
     #region Singleton
+    public playerState _playerState;
     public static PlayerManager Instance;
     public bool managerRunning;
     public string PlayerName = "Cal Kestis";
     public Stats playerStats = new Stats();
     public List<GameObject> EnemiesInTrigger = new List<GameObject>();
-    public float xpEarned;
+    public float xpEarned=0;
     public bool justFinishedFight = false;
     public string previousScene;
     public Vector3 positionInPrevScene;
-    public static GameObject lastFightTrigger { get; set; }
     public string deftext;
     public static GameObject RoamingUI;
     public static GameObject CombatUI;
     public List<Item> Inventory;
     public bool isInteractRange;
+    public Scene _activelevel;
+    public TriggerCombat currentTrigger;
+
+    public void ChangePlayerState(playerState newState)
+    {
+        switch (newState)
+        {
+            case playerState.Explore:
+                break;
+        }
+    }
 
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
             playerStats.name = PlayerName;
         }
         else
@@ -41,21 +51,10 @@ public class PlayerManager : MonoBehaviour
     }
     #endregion
 
-    public void fightEnded()
-    {
-        if (justFinishedFight)
-        {
-            if (xpEarned != null && xpEarned > 0)
-            {
-                addExp(xpEarned);
-            }
-            justFinishedFight = false;
-        }
-    }
-
     private void Start()
     {
         managerRunning = true;
+        _activelevel = SceneManager.GetActiveScene();
     }
 
     public bool managerStarted()
@@ -69,20 +68,23 @@ public class PlayerManager : MonoBehaviour
         playerStats.currentXP = 0;
         playerStats.xpThreshHold = playerStats.lvlthresholds[playerStats.playerLvl];
         playerStats.skillPoints++;
-        Invoke("hideAlert", 3f);
+        RoamUIManager.Instance.showAlertWindow("You have leveled up to Level "+playerStats.playerLvl);
     }
 
-    public void addExp(float earnedXP)
+    public void addExp()
     {
-        if ((playerStats.currentXP + earnedXP) > playerStats.xpThreshHold)
+        Debug.Log("Player Has Earend XP " + this.xpEarned);
+        if ((this.playerStats.currentXP + this.xpEarned) > this.playerStats.xpThreshHold)
         {
-            float leftoverXP = playerStats.currentXP - playerStats.xpThreshHold;
+            float leftoverXP = this.playerStats.currentXP - this.playerStats.xpThreshHold;
             LvlUp();
-            addExp(leftoverXP);
+            addExp();
         }
         else
         {
-            playerStats.currentXP += earnedXP;
+            this.playerStats.currentXP += this.xpEarned;
+            RoamUIManager.Instance.showAlertWindow("Earned "+this.xpEarned+" XP, You need " + (this.playerStats.lvlthresholds[this.playerStats.playerLvl] - (int)this.xpEarned) + " XP to level up");
+            this.xpEarned = 0;
         }
     }
 
@@ -100,14 +102,14 @@ public class PlayerManager : MonoBehaviour
 public class Stats
 {
     public Dictionary<int, int> lvlthresholds = new Dictionary<int, int> { { 1, 100 }, { 2, 250 }, { 3, 400 }, { 4, 600 }, { 5, 850 }, { 6, 1150 }, { 7, 1500 }, { 8, 1900 }, { 9, 2350 }, { 10, 2850 } };
-    public float maxHP = 100;
-    public float currentHP = 100;
-    public float baseHP = 10;
-    public float maxMana = 100;
-    public float currentMana = 50;
-    public float baseMana = 10;
+    public float maxHP = 1000f;
+    public float currentHP = 1000f;
+    public float baseHP = 10f;
+    public float maxMana = 100f;
+    public float currentMana = 50f;
+    public float baseMana = 10f;
     public float xpThreshHold = 10;
-    public float currentXP = 0;
+    public float currentXP = 0f;
     public int playerLvl = 1;
     public float Str = 3;
     public float Int = 3;
@@ -120,3 +122,5 @@ public class Stats
     public float baseDamage = 4;
     public float trueDamage = 4;
 }
+
+public enum playerState {Explore,inBattle,wonBattle,lostBattle}

@@ -115,7 +115,7 @@ public class CombatCharacterController : MonoBehaviour
     public IEnumerator AttackRandomFriendly()
     {
         Debug.Log("enemy behavior started");
-        if (characterData.characterTeam == CharTeam.Enemy)
+        if (characterData.characterTeam == CharTeam.Enemy && characterData.isAlive)
         {
             Debug.Log("Enemy " + characterData.charName + " Time is " + characterData.currSpeed);
             while (characterData.isAlive)
@@ -138,10 +138,12 @@ public class CombatCharacterController : MonoBehaviour
 
                     yield return null;
                     }
+                    if(characterData.isAlive && characterData.targetData.isAlive && characterData.isReadyForAction && characterData.targetData.isAttackable)
+                {
+                    AbilityData bestMove = minimax.ChooseBestMove();
+                    yield return characterData.QueueAttack(bestMove);
+                }
 
-
-                AbilityData bestMove = minimax.ChooseBestMove();
-                yield return characterData.QueueAttack(bestMove);
 
                 yield return null;
             }

@@ -208,7 +208,7 @@ public class CombatCharacterData
     {
 
 
-        if (!isAlive || characterState == CharState.Finished || targetData == null)
+        if (!isAlive || characterState==CharState.TryingAttack || characterState == CharState.Finished || targetData == null)
         {
             PlayerCont.ClearAttackQueue();
             yield break;

@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.SceneManagement;
 using TMPro;
+using DungeonArchitect.Samples.ShooterGame;
 
 public class BattleManager : MonoBehaviour
 {
@@ -17,16 +18,27 @@ public class BattleManager : MonoBehaviour
 
     public GameObject selectorGraphic;
 
+    public TriggerCombat Trigger;
+
     private void Awake()
     {
         Instance = this;
+        Trigger = PlayerManager.Instance.currentTrigger;
     }
 
     private void Start()
     {
+        StartCoroutine(Init());
+    }
+
+    public IEnumerator Init()
+    {
+        yield return new WaitUntil(() => Trigger.spawnEnemies() == true);
         FriendlyCharacters = FindObjectsOfType<CombatCharacterController>().ToList().FindAll(x => x.characterData.characterTeam == CharTeam.Friendly);
         EnemyCharacters = FindObjectsOfType<CombatCharacterController>().ToList().FindAll(x => x.characterData.characterTeam == CharTeam.Enemy);
-        Debug.Log("Enemy "+EnemyCharacters.First().characterData.charName+" was found");
+        Debug.Log("Enemy " + EnemyCharacters.First().characterData.charName + " was found");
+        Time.timeScale = 1f;
+        yield return null;
     }
 
     public void SelectCharacter (CombatCharacterData newChar)
@@ -124,29 +136,63 @@ public class BattleManager : MonoBehaviour
     {
         if(isFriendlyAlive && !isEnemyAlive)
         {
-            Debug.Log("Victory");
             stopAllChars();
-            float xpEarned = 0;
-            foreach (CombatCharacterController enemy in EnemyCharacters)
-            {
-                xpEarned += enemy.characterData.xpDrop;
-            }
-            PlayerPrefs.SetFloat("xpErn", xpEarned);
-            DisplayAlertWindow("Victory!");
-            PlayerManager.Instance.xpEarned = xpEarned;
-            PlayerManager.Instance.justFinishedFight = true;
-            Invoke("hideAlerWindow", 3f);
-            SceneManager.LoadSceneAsync("End");
-
+            Debug.Log("Victory");
+            StartCoroutine(endBattleVictory());
         }
 
         if(!isFriendlyAlive && isEnemyAlive)
         {
-            Debug.Log("Defeat");
             stopAllChars();
-            DisplayAlertWindow("Defeat!");
-            Invoke("hideAlertWindow", 3f);
+            Debug.Log("Defeat");
+            endBattleDefeat();
+            unloadCS();
         }
+    }
+
+    public IEnumerator endBattleVictory()
+    {
+        RoamUIManager.Instance.showAlertWindow("You are victorious");
+        yield return new WaitForSeconds(5);
+        foreach (CombatCharacterController enemy in EnemyCharacters)
+        {
+            PlayerManager.Instance.xpEarned += enemy.characterData.xpDrop;
+        }
+        Debug.Log("You Earned " + PlayerManager.Instance.xpEarned);
+        StartCoroutine(unloadCS());
+        PlayerManager.Instance.addExp();
+        yield return null;
+    }
+
+    public IEnumerator endBattleDefeat()
+    {
+        RoamUIManager.Instance.showAlertWindow("You have been defeated");
+        yield return new WaitForSeconds(5);
+        foreach (CombatCharacterController enemy in EnemyCharacters)
+        {
+            if(enemy.characterData.characterState == CharState.Dead)
+            {
+                PlayerManager.Instance.xpEarned += enemy.characterData.xpDrop;
+            }    
+        }
+        Debug.Log("You Earned " + PlayerManager.Instance.xpEarned);
+        PlayerManager.Instance.addExp();
+        yield return null;
+    }
+
+    public IEnumerator unloadCS()
+    {
+        Trigger.ReactivateRoamObjects();
+        Trigger.gameObject.SetActive(false);
+        GameObject[] Enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach (GameObject en in Enemies)
+        {
+            Destroy(en);
+        }
+        AsyncOperation _unloadCS = SceneManager.UnloadSceneAsync("CombatScene", UnloadSceneOptions.None);
+        yield return new WaitUntil(() => _unloadCS.isDone);
+
+        
     }
 
     public void stopAllChars()
@@ -199,8 +245,7 @@ public class BattleManager : MonoBehaviour
     public void DisplayAlertWindow(string result)
     {
         GameObject AlertP = GameObject.FindGameObjectWithTag("CombALC");
-        GameObject AlertWindow = AlertP.transform.Find("AlertsCanv").gameObject;
-        AlertWindow.GetComponentInChildren<TextMeshProUGUI>().SetText(result);
+        AlertP.GetComponentInChildren<TextMeshProUGUI>().SetText(result);
         AlertP.SetActive(true);
     }
     public void hideAlertWindow()

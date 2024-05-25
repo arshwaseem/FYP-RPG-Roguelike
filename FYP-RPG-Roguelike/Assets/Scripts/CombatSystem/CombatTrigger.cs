@@ -33,7 +33,6 @@ public class CombatTrigger : MonoBehaviour
         {
             PlayerManager.Instance.EnemiesInTrigger.Add(enemy);
         }
-        PlayerManager.lastFightTrigger = this.gameObject;
     }
 
     public void DestroyCombatTrigger()

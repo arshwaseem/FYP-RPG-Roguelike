@@ -14,6 +14,7 @@ public class InventoryUI : MonoBehaviour
     public Button RHandIcon;
     public Button LHandIcon;
     public Button RingIcon;
+    public GameObject itemsList;
 
     private void Awake()
     {
@@ -21,6 +22,15 @@ public class InventoryUI : MonoBehaviour
     }
 
     private void Start()
+    {
+    }
+
+    public void onInventoryOpen()
+    {
+
+    }
+
+    public void clearEquipmentIcons()
     {
         HeadIcon.image.sprite = null;
         HeadIcon.image.color = Color.clear;

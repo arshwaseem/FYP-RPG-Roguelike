@@ -9,6 +9,7 @@ public class RoamUIManager : MonoBehaviour
     [SerializeField] Slider hpSlider;
     [SerializeField] Slider mpSlider;
     [SerializeField] GameObject AlertWindow;
+    [SerializeField] TextMeshProUGUI playerLevel;
 
     public static RoamUIManager Instance;
 
@@ -19,12 +20,7 @@ public class RoamUIManager : MonoBehaviour
 
     private void Start()
     {
-        hpSlider.maxValue = PlayerManager.Instance.playerStats.maxHP;
-        hpSlider.minValue = 0;
-        mpSlider.maxValue = PlayerManager.Instance.playerStats.maxMana;
-        mpSlider.minValue = 0;
-        UpdateHealth(PlayerManager.Instance.playerStats.currentHP);
-        UpdateMana(PlayerManager.Instance.playerStats.currentMana);
+        InitializeStatsUI();
     }
 
     public void UpdateHealth(float value)
@@ -41,5 +37,16 @@ public class RoamUIManager : MonoBehaviour
     {
         AlertWindow.GetComponentInChildren<TextMeshProUGUI>().text = message;
         AlertWindow.SetActive(true);
+    }
+
+    public void InitializeStatsUI()
+    {
+        hpSlider.maxValue = PlayerManager.Instance.playerStats.maxHP;
+        hpSlider.minValue = 0;
+        mpSlider.maxValue = PlayerManager.Instance.playerStats.maxMana;
+        mpSlider.minValue = 0;
+        UpdateHealth(PlayerManager.Instance.playerStats.currentHP);
+        UpdateMana(PlayerManager.Instance.playerStats.currentMana);
+        playerLevel.text = PlayerManager.Instance.playerStats.playerLvl.ToString();
     }
 }
