@@ -14,6 +14,6 @@ public class ContinueButton : MonoBehaviour
     }
     public void cont()
     {
-        SceneManager.LoadScene("DebugLevel");
+        SceneManager.LoadScene("MainMenu");
     }
 }

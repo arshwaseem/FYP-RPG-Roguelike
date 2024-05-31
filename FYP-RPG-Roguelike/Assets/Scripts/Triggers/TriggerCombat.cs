@@ -1,9 +1,11 @@
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class TriggerCombat : TriggerBasic
 {
@@ -12,6 +14,8 @@ public class TriggerCombat : TriggerBasic
     public GameObject CamToDeactivate;
     public GameObject EventToDeactivate;
     public AsyncOperation EnemySpawner;
+    public GameObject Fader;
+    public GameObject alWin;
 
     public List<GameObject> EnemiesToSpawn;
 
@@ -23,7 +27,8 @@ public class TriggerCombat : TriggerBasic
     public override void TriggerInvoke()
     {
         base.TriggerInvoke();
-        StartCoroutine(CombatInit());
+        Fader.SetActive(true);
+        StartCoroutine(FadeIn());
     }
 
     public bool DeactivateRoamObjects()
@@ -44,6 +49,22 @@ public class TriggerCombat : TriggerBasic
         return true;
     }
 
+    public IEnumerator FadeIn ()
+    {
+        Color fadeColor = Fader.GetComponent<Image>().color;
+
+        while( Fader.GetComponent<Image>().color.a < 1)
+        {
+            fadeColor = new Color(0, 0, 0, fadeColor.a + (2 * Time.deltaTime));
+            Fader.GetComponent<Image>().color = fadeColor;
+            yield return null;
+        }
+
+        StartCoroutine(CombatInit());
+
+        yield return null;
+    }
+
     public IEnumerator CombatInit()
     {
         yield return new WaitUntil(() => DeactivateRoamObjects() == true);
@@ -57,6 +78,10 @@ public class TriggerCombat : TriggerBasic
             if (_combatLoad.progress >= 0.9f)
             {
                 _combatLoad.allowSceneActivation = true;
+                alWin.GetComponentInChildren<TextMeshProUGUI>().text = "Wait For Your Time Bar To Fill, Then Click on Enemy To Select and Perform an Attack or Magic";
+                alWin.SetActive(true);
+                Fader.GetComponent<Image>().color = new Color(0, 0, 0, 0);
+                Fader.SetActive(false);
 
             }
         };

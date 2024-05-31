@@ -102,8 +102,8 @@ public class PlayerManager : MonoBehaviour
 public class Stats
 {
     public Dictionary<int, int> lvlthresholds = new Dictionary<int, int> { { 1, 100 }, { 2, 250 }, { 3, 400 }, { 4, 600 }, { 5, 850 }, { 6, 1150 }, { 7, 1500 }, { 8, 1900 }, { 9, 2350 }, { 10, 2850 } };
-    public float maxHP = 1000f;
-    public float currentHP = 1000f;
+    public float maxHP = 100f;
+    public float currentHP = 100f;
     public float baseHP = 10f;
     public float maxMana = 100f;
     public float currentMana = 50f;
@@ -117,7 +117,7 @@ public class Stats
     public float Armor = 2;
     public float statusResist = 3;
     public float spellAmp = 3;
-    public string name = "Cal Kestis";
+    public string name = "Grand Magus Azad";
     public int skillPoints = 0;
     public float baseDamage = 4;
     public float trueDamage = 4;
