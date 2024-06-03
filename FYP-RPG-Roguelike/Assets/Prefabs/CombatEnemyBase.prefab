@@ -833,7 +833,7 @@ MonoBehaviour:
     charUi:
       playerCombatUI: {fileID: 0}
     basicAttack:
-      ability_name: defaultAbility
+      ability_name: Swipe
       ability_description: Placeholder
       abilityValue: 10
       manaCost: 1
@@ -851,7 +851,7 @@ MonoBehaviour:
     charAbilities:
     - ability_name: Magic Ball
       ability_description: ball of magic
-      abilityValue: 40
+      abilityValue: 15
       manaCost: 50
       type: 0
       output: 0

@@ -15,7 +15,10 @@ public class TriggerCombat : TriggerBasic
     public GameObject EventToDeactivate;
     public AsyncOperation EnemySpawner;
     public GameObject Fader;
+    public GameObject inv;
+    public GameObject invCanvas;
     public GameObject alWin;
+    public bool isLast = false;
 
     public List<GameObject> EnemiesToSpawn;
 
@@ -37,6 +40,8 @@ public class TriggerCombat : TriggerBasic
         PlayerDeactivate.SetActive(false);
         CamToDeactivate.SetActive(false);
         EventToDeactivate.SetActive(false);
+        inv.SetActive(false);
+        invCanvas.SetActive(false);
         return true;
     }
 
@@ -46,11 +51,16 @@ public class TriggerCombat : TriggerBasic
         PlayerDeactivate.SetActive(true);
         CamToDeactivate.SetActive(true);
         EventToDeactivate.SetActive(true);
+        inv.SetActive(true);
+        invCanvas.SetActive(true);
+        this.gameObject.SetActive(false);
         return true;
     }
 
     public IEnumerator FadeIn ()
     {
+        Fader.GetComponent<Image>().color = new Color(0, 0, 0, 0);
+        Fader.SetActive(true);
         Color fadeColor = Fader.GetComponent<Image>().color;
 
         while( Fader.GetComponent<Image>().color.a < 1)

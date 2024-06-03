@@ -34,7 +34,7 @@ public class MainMenu : MonoBehaviour
     {
         yield return null;
 
-        AsyncOperation loadingScreen = SceneManager.LoadSceneAsync("FullDemo");
+        AsyncOperation loadingScreen = SceneManager.LoadSceneAsync("Opener");
         loadingScreen.allowSceneActivation = false;
 
         while(!loadingScreen.isDone)

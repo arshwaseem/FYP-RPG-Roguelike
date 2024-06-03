@@ -1,39 +1,28 @@
-using System.Collections;
+using MoreMountains.InventoryEngine;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
+using TMPro;
 
 public class Chest : MonoBehaviour
 {
-    public BoxCollider collider;
-    public bool isInteractable=false;
-    public GameObject DamageTrigger;
-    public List<Item> Items;
 
-    private void Start()
-    {
-        collider = gameObject.GetComponent<BoxCollider>();
-    }
+    public BoxCollider _area;
+    public List<InventoryItem> _items;
+    public string _names = "";
+    public GameObject _AlertWindow;
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("in contact");
-        RoamUIManager.Instance.showAlertWindow("Press E to open this chest");
-        isInteractable = true;
-    }
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.F))
         {
-            if (isInteractable == true) { 
-            RoamUIManager.Instance.showAlertWindow("Picked Up: Health Potion, Mana Potion, Helmet, Sword");
-            DamageTrigger.SetActive(true);
+            foreach (InventoryItem item in _items)
+            {
+                item.Pick("PlayerPlaceHolder");
+                _names += item.name + ", ";
             }
 
-            foreach (Item item in Items)
-            {
-                PlayerManager.Instance.Inventory.Add(item);
-            }
+            _AlertWindow.GetComponent<TextMeshProUGUI>().text = "Picked Up Items " + _names + " Click on the inventory button to open and use Inventory Items";
         }
     }
-
 }

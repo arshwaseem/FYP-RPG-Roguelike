@@ -1,3 +1,4 @@
+using MoreMountains.InventoryEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,10 +24,10 @@ public class PlayerManager : MonoBehaviour
     public string deftext;
     public static GameObject RoamingUI;
     public static GameObject CombatUI;
-    public List<Item> Inventory;
     public bool isInteractRange;
     public Scene _activelevel;
     public TriggerCombat currentTrigger;
+    public Inventory currInv;
 
     public void ChangePlayerState(playerState newState)
     {
@@ -54,12 +55,21 @@ public class PlayerManager : MonoBehaviour
     private void Start()
     {
         managerRunning = true;
+        currInv.AddItem(new HealthPotion(), 2);
+        currInv.AddItem(new ManaPotion(), 2);
         _activelevel = SceneManager.GetActiveScene();
+
     }
 
     public bool managerStarted()
     {
         return managerRunning;
+    }
+
+    public void updateUI()
+    {
+        RoamUIManager.Instance.UpdateHealth(this.playerStats.currentHP);
+        RoamUIManager.Instance.UpdateMana(this.playerStats.currentMana);
     }
 
     public void LvlUp()
@@ -69,6 +79,7 @@ public class PlayerManager : MonoBehaviour
         playerStats.xpThreshHold = playerStats.lvlthresholds[playerStats.playerLvl];
         playerStats.skillPoints++;
         RoamUIManager.Instance.showAlertWindow("You have leveled up to Level "+playerStats.playerLvl);
+        RoamUIManager.Instance.playerLevel.text = playerStats.playerLvl.ToString();
     }
 
     public void addExp()

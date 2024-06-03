@@ -208,9 +208,6 @@ namespace MoreMountains.InventoryEngine
 		/// the button used to use an item
 		[MMCondition("ManageButtons", true)]
 		public Button UseButton;
-		/// the button used to unequip an item
-		[MMCondition("ManageButtons", true)]
-		public Button UnEquipButton;
         
 		/// returns the active slot
 		public InventorySlot CurrentlySelectedInventorySlot { get; set; }
@@ -252,7 +249,6 @@ namespace MoreMountains.InventoryEngine
 		{
 			_isDropButtonNotNull = DropButton != null;
 			_isMoveButtonNotNull = MoveButton != null;
-			_isUnEquipButtonNotNull = UnEquipButton != null;
 			_isUseButtonNotNull = UseButton != null;
 			_isEquipButtonNotNull = EquipButton != null;
 			_isEquipUseButtonNotNull = EquipUseButton != null;
@@ -332,11 +328,6 @@ namespace MoreMountains.InventoryEngine
 					                                CurrentlySelectedInventorySlot.Equippable()) && CurrentlySelectedInventorySlot.EquipUseButtonShouldShow());
 				}
 
-				if (_isUnEquipButtonNotNull)
-				{
-					SetButtonState(UnEquipButton, CurrentlySelectedInventorySlot.Unequippable() && CurrentlySelectedInventorySlot.UnequipButtonShouldShow());
-				}
-
 				if (_isMoveButtonNotNull)
 				{
 					SetButtonState(MoveButton, CurrentlySelectedInventorySlot.Movable() && CurrentlySelectedInventorySlot.MoveButtonShouldShow());
@@ -354,7 +345,6 @@ namespace MoreMountains.InventoryEngine
 				SetButtonState(EquipUseButton, false);
 				SetButtonState(DropButton, false);
 				SetButtonState(MoveButton, false);
-				SetButtonState(UnEquipButton, false);
 			}
 		}
 

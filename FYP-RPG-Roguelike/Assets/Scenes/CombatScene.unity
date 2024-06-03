@@ -4730,6 +4730,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     - target: {fileID: 8493358828489588311, guid: 659d51927e0934f48bee17e9fcc45e1a, type: 3}
+      propertyPath: characterData.speedLimit
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8493358828489588311, guid: 659d51927e0934f48bee17e9fcc45e1a, type: 3}
       propertyPath: characterData.charUi.playerCombatUI
       value: 
       objectReference: {fileID: 1684726834}

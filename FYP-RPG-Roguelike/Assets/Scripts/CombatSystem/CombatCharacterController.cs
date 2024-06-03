@@ -28,7 +28,11 @@ public class CombatCharacterController : MonoBehaviour
     }
     public void Start()
     {
-        minimax = new Minimax(this);
+        if(characterData.characterTeam == CharTeam.Enemy)
+        {
+            minimax = new Minimax(this);
+        }
+        
         StartCoroutine(combatInitializer());
     }
 

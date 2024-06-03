@@ -9,7 +9,7 @@ public class RoamUIManager : MonoBehaviour
     [SerializeField] Slider hpSlider;
     [SerializeField] Slider mpSlider;
     [SerializeField] GameObject AlertWindow;
-    [SerializeField] TextMeshProUGUI playerLevel;
+    [SerializeField] public TextMeshProUGUI playerLevel;
 
     public static RoamUIManager Instance;
 

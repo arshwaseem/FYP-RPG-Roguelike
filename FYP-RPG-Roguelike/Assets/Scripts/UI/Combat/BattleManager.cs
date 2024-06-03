@@ -20,6 +20,8 @@ public class BattleManager : MonoBehaviour
 
     public TriggerCombat Trigger;
 
+    public bool last = false;
+
     private void Awake()
     {
         Instance = this;
@@ -29,6 +31,11 @@ public class BattleManager : MonoBehaviour
     private void Start()
     {
         StartCoroutine(Init());
+    }
+
+    public void setLast()
+    {
+        last = true;
     }
 
     public IEnumerator Init()
@@ -161,6 +168,10 @@ public class BattleManager : MonoBehaviour
         Debug.Log("You Earned " + PlayerManager.Instance.xpEarned);
         StartCoroutine(unloadCS());
         PlayerManager.Instance.addExp();
+        if (Trigger.isLast == true)
+        {
+            DisplayAlertWindow("All Enemies Defeated, Find the Exit Now");
+        }
         yield return null;
     }
 
@@ -183,6 +194,9 @@ public class BattleManager : MonoBehaviour
     public IEnumerator unloadCS()
     {
         Trigger.ReactivateRoamObjects();
+        PlayerManager.Instance.playerStats.currentHP = FriendlyCharacters[0].characterData.currHealth;
+        PlayerManager.Instance.playerStats.currentMana = FriendlyCharacters[0].characterData.currMana;
+        PlayerManager.Instance.updateUI();
         Trigger.gameObject.SetActive(false);
         GameObject[] Enemies = GameObject.FindGameObjectsWithTag("Enemy");
         foreach (GameObject en in Enemies)
